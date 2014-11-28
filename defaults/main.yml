@@ -1,2 +1,17 @@
 ---
 # defaults file for confluence
+
+confluence_version: 5.6.4
+confluence_arch: x64
+confluence_binary: atlassian-confluence-{{ confluence_version }}-{{ confluence_arch }}.bin
+confluence_binary_sha256sum: 51f96960631a99a1fd6990a50a0b5d94e6859ab51b87564c861db99bbac15621
+confluence_download_url: http://www.atlassian.com/software/confluence/downloads/binary/{{ confluence_binary }}
+confluence_work_dir: /opt/atlassian
+confluence_response_file: confluence.response.varfile
+confluence_binary_path: {{ confluence_work_dir }}/{{ confluence_binary }}
+confluence_response_path: {{ confluence_work_dir }}/{{ confluence_response_file }}
+confluence_run_as_service: true
+confluence_install_dir: /opt/atlassian/confluence
+confluence_data_dir: /var/atlassian/application-data/confluence
+confluence_rmi_port: 8000
+confluence_http_port: 8090

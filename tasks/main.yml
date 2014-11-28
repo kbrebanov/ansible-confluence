@@ -1,2 +1,28 @@
 ---
 # tasks file for confluence
+
+- name: Download Confluence
+  get_url: >
+    url={{ confluence_download_url }}
+    dest={{ confluence_work_dir }}/
+    sha256sum={{ confluence_binary_sha256sum }}
+  tags: confluence
+
+- name: Ensure the Confluence installation file is executable
+  file: >
+    path={{ confluence_binary_path }}
+    mode=0744
+    state=touch
+  tags: confluence
+
+- name: Create Confluence unattended response file
+  template: >
+    src=confluence.response.varfile.j2
+    dest={{ confluence_response_path }}
+  tags: confluence
+
+- name: Install Confluence in unattended mode
+  shell: {{ confluence_binary_path }} -q -varfile {{ confluence_response_path }}
+  args:
+    chdir: {{ confluence_work_dir }}/
+  tags: confluence

@@ -1,0 +1,12 @@
+# {{ ansible_managed }}
+#install4j response file for Confluence {{ confluence_version }}
+rmiPort$Long={{ confluence_rmi_port }}
+app.install.service$Boolean={{ confluence_run_as_service }}
+existingInstallationDir=/opt/Confluence
+sys.confirmedUpdateInstallationString=false
+sys.languageId=en
+sys.installationDir={{ confluence_install_dir }}
+app.confHome={{ confluence_data_dir }}
+executeLauncherAction$Boolean=true
+httpPort$Long={{ confluence_http_port }}
+portChoice=default
