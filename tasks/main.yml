@@ -1,10 +1,19 @@
 ---
 # tasks file for confluence
 
+- name: Create Confluence working directory
+  file: >
+    path={{ confluence_work_dir }}
+    owner=root
+    group=root
+    mode=0755
+    state=directory
+  tags: confluence
+
 - name: Download Confluence
   get_url: >
     url={{ confluence_download_url }}
-    dest={{ confluence_work_dir }}/
+    dest={{ confluence_work_dir }}/{{ confluence_binary }}
     sha256sum={{ confluence_binary_sha256sum }}
   tags: confluence
 
@@ -12,7 +21,7 @@
   file: >
     path={{ confluence_binary_path }}
     mode=0744
-    state=touch
+    state=file
   tags: confluence
 
 - name: Create Confluence unattended response file
@@ -22,7 +31,58 @@
   tags: confluence
 
 - name: Install Confluence in unattended mode
-  shell: {{ confluence_binary_path }} -q -varfile {{ confluence_response_path }}
+  shell: "{{ confluence_binary_path }} -q -varfile {{ confluence_response_path }}"
   args:
-    chdir: {{ confluence_work_dir }}/
+    chdir: "{{ confluence_work_dir }}/"
+    creates: "{{ confluence_install_dir }}/uninstall"
+  tags: confluence
+
+- name: Create Confluence database
+  mysql_db: >
+    name={{ confluence_database_name }}
+    collation={{ confluence_database_collation }}
+    encoding={{ confluence_database_encoding }}
+    state=present
+  tags: confluence
+
+- name: Create Confluence database user
+  mysql_user: >
+    name={{ confluence_database_user }}
+    password={{ confluence_database_user_password }}
+    priv={{ confluence_database_user_priv }}
+    state=present
+  tags: confluence
+
+- name: Download MySQL Java connector
+  get_url: >
+    url={{ confluence_mysql_connector_url }}
+    dest={{ confluence_work_dir }}/{{ confluence_mysql_connector_archive }}
+    sha256sum={{ confluence_mysql_connector_sha256sum }}
+  tags: confluence
+
+- name: Unarchive MySQL Java connector
+  unarchive: >
+    src={{ confluence_work_dir }}/{{ confluence_mysql_connector_archive }}
+    dest={{ confluence_work_dir }}/
+    copy=no
+  tags: confluence
+
+- name: Copy MySQL Java connector file
+  command: cp {{ confluence_work_dir }}/{{ confluence_mysql_connector }}/{{ confluence_mysql_connector }}-bin.jar {{ confluence_install_dir }}/confluence/WEB-INF/lib/
+  args:
+    creates: "{{ confluence_install_dir }}/confluence/WEB-INF/lib/{{ confluence_mysql_connector }}-bin.jar"
+  tags: confluence
+
+- name: Create Confluence setenv.sh
+  template: >
+    src=setenv.sh.j2
+    dest={{ confluence_install_dir }}/bin/setenv.sh
+    owner=root
+    group=root
+    mode=0755
+  notify: restart confluence
+  tags: confluence
+
+- name: Ensure Confluence service is started and enabled on boot
+  service: name={{ confluence_service_name }} pattern={{ confluence_install_dir }}/jre//bin/java state=started enabled=yes
   tags: confluence
