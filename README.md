@@ -32,7 +32,7 @@ Install Confluence
 ```
 - hosts: all
   roles:
-    - { role: confluence }
+    - { role: kbrebanov.confluence }
 ```
 
 Install Confluence specifying version
