@@ -28,11 +28,26 @@ Dependencies
 Example Playbook
 ----------------
 
-1) Install Confluence
+Install Confluence
+```
+- hosts: all
+  roles:
+    - { role: confluence }
+```
 
-    - hosts: all
-      roles:
-         - { role: confluence }
+Install Confluence specifying version
+```
+- hosts: all
+  roles:
+    - { role: kbrebanov.confluence, confluence_version: 5.7.3 confluence_archive_sha256sum: 81bc02e8557a108731c41723162bbbfc42c7023d970fad347156497c9586ed42 }
+```
+
+Install Confluence specifying Confluence JVM memory
+```
+- hosts: all
+  roles:
+    - { role: kbrebanov.confluence, confluence_jvm_minimum_memory: 3000m, confluence_jvm_maximum_memory: 4096m }
+```
 
 License
 -------
