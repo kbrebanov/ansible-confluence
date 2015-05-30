@@ -1,6 +1,18 @@
 ---
 # tasks file for confluence
 
+- name: Include distribution specific variables
+  include_vars: "{{ ansible_distribution }}.yml"
+  tags: confluence
+
+- include: CentOS.yml
+  when: ansible_distribution == "CentOS"
+  tags: confluence
+
+- include: Ubuntu.yml
+  when: ansible_distribution == "Ubuntu"
+  tags: confluence
+
 - name: Create Confluence group
   group: name=confluence state=present
   tags: confluence
