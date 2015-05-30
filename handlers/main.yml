@@ -2,5 +2,5 @@
 # handlers file for confluence
 
 - name: restart confluence
-  service: name={{ confluence_service_name }} state=restarted
+  service: name=confluence state=restarted pattern=confluence
   tags: confluence

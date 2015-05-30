@@ -1,6 +1,20 @@
 ---
 # tasks file for confluence
 
+- name: Create Confluence group
+  group: name=confluence state=present
+  tags: confluence
+
+- name: Create Confluence user
+  user: >
+    name=confluence
+    group=confluence
+    comment="Confluence user"
+    home={{ confluence_home_dir }}
+    shell=/bin/bash
+    createhome=no
+  tags: confluence
+
 - name: Create Confluence working directory
   file: >
     path={{ confluence_work_dir }}
@@ -10,79 +24,82 @@
     state=directory
   tags: confluence
 
+- name: Create Confluence install directory
+  file: >
+    path={{ confluence_install_dir }}
+    owner=confluence
+    group=confluence
+    mode=0755
+    state=directory
+  tags: confluence
+
+- name: Create Confluence home directory
+  file: >
+    path={{ confluence_home_dir }}
+    owner=confluence
+    group=confluence
+    mode=0755
+    state=directory
+  tags: confluence
+
 - name: Download Confluence
   get_url: >
     url={{ confluence_download_url }}
-    dest={{ confluence_work_dir }}/{{ confluence_binary }}
-    sha256sum={{ confluence_binary_sha256sum }}
+    dest={{ confluence_work_dir }}/{{ confluence_archive }}
+    sha256sum={{ confluence_archive_sha256sum }}
   tags: confluence
 
-- name: Ensure the Confluence installation file is executable
-  file: >
-    path={{ confluence_binary_path }}
-    mode=0744
-    state=file
-  tags: confluence
-
-- name: Create Confluence unattended response file
-  template: >
-    src=confluence.response.varfile.j2
-    dest={{ confluence_response_path }}
-  tags: confluence
-
-- name: Install Confluence in unattended mode
-  shell: "{{ confluence_binary_path }} -q -varfile {{ confluence_response_path }}"
-  args:
-    chdir: "{{ confluence_work_dir }}/"
-    creates: "{{ confluence_install_dir }}/uninstall"
-  tags: confluence
-
-- name: Create Confluence database
-  mysql_db: >
-    name={{ confluence_database_name }}
-    collation={{ confluence_database_collation }}
-    encoding={{ confluence_database_encoding }}
-    state=present
-  tags: confluence
-
-- name: Create Confluence database user
-  mysql_user: >
-    name={{ confluence_database_user }}
-    password={{ confluence_database_user_password }}
-    priv={{ confluence_database_user_priv }}
-    state=present
-  tags: confluence
-
-- name: Download MySQL Java connector
-  get_url: >
-    url={{ confluence_mysql_connector_url }}
-    dest={{ confluence_work_dir }}/{{ confluence_mysql_connector_archive }}
-    sha256sum={{ confluence_mysql_connector_sha256sum }}
-  tags: confluence
-
-- name: Unarchive MySQL Java connector
+- name: Extract Confluence to install directory
   unarchive: >
-    src={{ confluence_work_dir }}/{{ confluence_mysql_connector_archive }}
-    dest={{ confluence_work_dir }}/
+    src={{ confluence_work_dir }}/{{ confluence_archive }}
+    dest={{ confluence_install_dir }}
+    owner=confluence
+    group=confluence
+    mode=0755
     copy=no
+    creates={{ confluence_install_dir }}/atlassian-confluence-{{ confluence_version }}
   tags: confluence
 
-- name: Copy MySQL Java connector file
-  command: cp {{ confluence_work_dir }}/{{ confluence_mysql_connector }}/{{ confluence_mysql_connector }}-bin.jar {{ confluence_install_dir }}/confluence/WEB-INF/lib/
-  args:
-    creates: "{{ confluence_install_dir }}/confluence/WEB-INF/lib/{{ confluence_mysql_connector }}-bin.jar"
+- name: Create symlink for current version
+  file: >
+    src={{ confluence_install_dir }}/atlassian-confluence-{{ confluence_version }}
+    dest={{ confluence_install_dir }}/current
+    state=link
   tags: confluence
 
-- name: Create Confluence setenv.sh
+- name: Create Confluence init properties
+  template: >
+    src=confluence-init.properties.j2
+    dest={{ confluence_install_dir }}/atlassian-confluence-{{ confluence_version }}/confluence/WEB-INF/classes/confluence-init.properties
+    owner=confluence
+    group=confluence
+    mode=0644
+  notify: restart confluence
+  tags: confluence
+
+- name: Set Confluence environment settings
   template: >
     src=setenv.sh.j2
-    dest={{ confluence_install_dir }}/bin/setenv.sh
-    owner=root
-    group=root
+    dest={{ confluence_install_dir }}/atlassian-confluence-{{ confluence_version }}/bin/setenv.sh
+    owner=confluence
+    group=confluence
     mode=0755
   notify: restart confluence
   tags: confluence
 
+- name: Create Confluence init script
+  template: >
+    src=confluence.j2
+    dest=/etc/init.d/confluence
+    owner=root
+    group=root
+    mode=0755
+  tags: confluence
+
 - name: Ensure Confluence service is started and enabled on boot
-  service: name={{ confluence_service_name }} pattern={{ confluence_install_dir }}/jre//bin/java state=started enabled=yes
+  service: >
+    name=confluence
+    state=started
+    pattern='/usr/bin/java -Djava.util.logging.config.file=/opt/atlassian/confluence/atlassian-confluence-{{ confluence_version }}/conf/logging.properties'
+    enabled=yes
   tags: confluence
