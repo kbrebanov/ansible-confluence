@@ -1,7 +1,7 @@
 Confluence
 ==========
 
-[![Ansible Galaxy](https://img.shields.io/badge/galaxy-kbrebanov.confluence-660198.svg)](https://galaxy.ansible.com/list#/roles/3979)
+[![Ansible Role](https://img.shields.io/ansible/role/3979.svg)](https://galaxy.ansible.com/list#/roles/3979)
 
 Installs Confluence.
 
