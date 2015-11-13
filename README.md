@@ -15,8 +15,8 @@ Role Variables
 
 | Name                          | Default                                                          | Description                      |
 |-------------------------------|------------------------------------------------------------------|----------------------------------|
-| confluence_version            | 5.7.4                                                            | Version of Confluence to install |
-| confluence_archive_sha256sum  | 3f84676dabec1d4a9bac6a2676f600cdfee2088b8b9693a4fac88324fa279db2 | SHA 256 checksum of archive      |
+| confluence_version            | 5.8.16                                                           | Version of Confluence to install |
+| confluence_archive_sha256sum  | 9ccf96838a7b00439b62f4a3f1377cd32a83b3169f5e4ee7bd6c8a244b1ea59b | SHA 256 checksum of archive      |
 | confluence_jvm_minimum_memory | 1024m                                                            | Confluence JVM minimum memory    |
 | confluence_jvm_maximum_memory | 1024m                                                            | Confluence JVM maximum memory    |
 
