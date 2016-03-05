@@ -1,7 +1,7 @@
 Confluence
 ==========
 
-[![Ansible Role](https://img.shields.io/ansible/role/3979.svg)](https://galaxy.ansible.com/list#/roles/3979)
+[![Build Status](https://travis-ci.org/kbrebanov/ansible-confluence.svg?branch=master)](https://travis-ci.org/kbrebanov/ansible-confluence)
 
 Installs Confluence.
 
