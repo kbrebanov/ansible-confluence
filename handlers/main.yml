@@ -2,6 +2,7 @@
 # handlers file for confluence
 
 - name: restart confluence
+  become: yes
   service:
     name: confluence
     state: restarted

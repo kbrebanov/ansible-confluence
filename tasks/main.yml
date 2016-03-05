@@ -17,6 +17,7 @@
     - confluence
 
 - name: Create Confluence group
+  become: yes
   group:
     name: confluence
     state: present
@@ -24,6 +25,7 @@
     - confluence
 
 - name: Create Confluence user
+  become: yes
   user:
     name: confluence
     group: confluence
@@ -35,6 +37,7 @@
     - confluence
 
 - name: Create Confluence working directory
+  become: yes
   file:
     path: "{{ confluence_work_dir }}"
     owner: root
@@ -45,6 +48,7 @@
     - confluence
 
 - name: Create Confluence install directory
+  become: yes
   file:
     path: "{{ confluence_install_dir }}"
     owner: confluence
@@ -55,6 +59,7 @@
     - confluence
 
 - name: Create Confluence home directory
+  become: yes
   file:
     path: "{{ confluence_home_dir }}"
     owner: confluence
@@ -65,6 +70,7 @@
     - confluence
 
 - name: Download Confluence
+  become: yes
   get_url:
     url: "{{ confluence_download_url }}"
     dest: "{{ confluence_work_dir }}/{{ confluence_archive }}"
@@ -73,6 +79,7 @@
     - confluence
 
 - name: Extract Confluence to install directory
+  become: yes
   unarchive:
     src: "{{ confluence_work_dir }}/{{ confluence_archive }}"
     dest: "{{ confluence_install_dir }}"
@@ -85,6 +92,7 @@
     - confluence
 
 - name: Create symlink for current version
+  become: yes
   file:
     src: "{{ confluence_install_dir }}/atlassian-confluence-{{ confluence_version }}"
     dest: "{{ confluence_install_dir }}/current"
@@ -93,6 +101,7 @@
     - confluence
 
 - name: Create Confluence init properties
+  become: yes
   template:
     src: confluence-init.properties.j2
     dest: "{{ confluence_install_dir }}/atlassian-confluence-{{ confluence_version }}/confluence/WEB-INF/classes/confluence-init.properties"
@@ -105,6 +114,7 @@
     - confluence
 
 - name: Set Confluence environment settings
+  become: yes
   template:
     src: setenv.sh.j2
     dest: "{{ confluence_install_dir }}/atlassian-confluence-{{ confluence_version }}/bin/setenv.sh"
@@ -117,6 +127,7 @@
     - confluence
 
 - name: Create Confluence init script
+  become: yes
   template:
     src: confluence.j2
     dest: /etc/init.d/confluence
@@ -127,6 +138,7 @@
     - confluence
 
 - name: Ensure Confluence service is started and enabled on boot
+  become: yes
   service:
     name: confluence
     state: started
