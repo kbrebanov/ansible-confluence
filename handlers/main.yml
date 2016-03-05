@@ -2,5 +2,9 @@
 # handlers file for confluence
 
 - name: restart confluence
-  service: name=confluence state=restarted pattern=confluence
-  tags: confluence
+  service:
+    name: confluence
+    state: restarted
+    pattern: confluence
+  tags:
+    - confluence
