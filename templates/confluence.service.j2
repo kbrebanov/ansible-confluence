@@ -1,0 +1,14 @@
+[Unit]
+Description=Atlassian Confluence
+After=syslog.target network.target
+   
+[Service]
+Type=forking
+User=confluence
+Group=confluence
+Environment=JAVA_HOME=/usr/java/default
+ExecStart={{ confluence_install_dir }}/atlassian-confluence-{{ confluence_version }}/bin/start-confluence.sh
+ExecStop={{ confluence_install_dir }}/atlassian-confluence-{{ confluence_version }}/bin/stop-confluence.sh
+   
+[Install]
+WantedBy=multi-user.target
